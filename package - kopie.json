@@ -1,0 +1,10 @@
+{
+  "name": "autocamp-free-star-web",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Statický web Autocamp Free Star připravený pro produkci.",
+  "scripts": {
+    "dev": "node scripts/dev-server.js",
+    "start": "node scripts/dev-server.js"
+  }
+}

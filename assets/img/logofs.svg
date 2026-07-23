@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 962 140" role="img" aria-label="Autocamp Free Star">
+  <title>Autocamp Free Star</title>
+
+  <!-- Campfire flame – main body -->
+  <path d="M41,14 C57,28 65,52 61,74 C58,88 51,96 41,100 C31,96 24,88 21,74 C17,52 25,28 41,14Z" fill="#C8921A"/>
+
+  <!-- Left flame wing -->
+  <path d="M23,52 C13,40 3,50 7,68 C9,78 17,84 23,78 C17,68 17,54 23,52Z" fill="#C8921A"/>
+
+  <!-- Right flame wing -->
+  <path d="M59,52 C69,40 79,50 75,68 C73,78 65,84 59,78 C65,68 65,54 59,52Z" fill="#C8921A"/>
+
+  <!-- Crossed logs -->
+  <rect x="14" y="106" width="54" height="11" rx="5.5" fill="#C8921A" opacity="0.68" transform="rotate(-13 41 111)"/>
+  <rect x="14" y="106" width="54" height="11" rx="5.5" fill="#C8921A" opacity="0.68" transform="rotate(13 41 111)"/>
+
+  <!-- "Autocamp" – bold sans-serif -->
+  <text x="90" y="104"
+        font-family="'Arial Black', 'Helvetica Neue', Arial, sans-serif"
+        font-weight="900"
+        font-size="72"
+        fill="#3C3C3C"
+        textLength="388"
+        lengthAdjust="spacingAndGlyphs">Autocamp</text>
+
+  <!-- Vertical separator -->
+  <line x1="494" y1="18" x2="494" y2="122" stroke="#B8B8B8" stroke-width="1.5"/>
+
+  <!-- "Free Star" – italic serif -->
+  <text x="516" y="107"
+        font-family="Palatino, 'Palatino Linotype', 'Book Antiqua', Georgia, serif"
+        font-style="italic"
+        font-size="82"
+        fill="#C8921A"
+        textLength="418"
+        lengthAdjust="spacingAndGlyphs">Free Star</text>
+</svg>

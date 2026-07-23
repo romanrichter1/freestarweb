@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#2f5233">
+    <title>Kalendář akcí | Autocamp Free Star Strachotín</title>
+    <meta name="description" content="Přehled akcí a programu v okolí Autocampu Free Star — koncerty, festivaly, degustace vín a výlety na jižní Moravě.">
+    <link rel="canonical" href="https://www.freestar.cz/kalendar.html">
+    <link rel="icon" type="image/png" href="assets/img/favicon.png">
+    <link rel="apple-touch-icon" href="assets/img/favicon.png">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Autocamp Free Star">
+    <meta property="og:locale" content="cs_CZ">
+    <meta property="og:title" content="Kalendář akcí | Autocamp Free Star Strachotín">
+    <meta property="og:description" content="Koncerty, festivaly, degustace vín a výlety v okolí kempu Free Star na jižní Moravě.">
+    <meta property="og:image" content="https://autocamp-free-star.vercel.app/assets/img/hero-palava2.jpg">
+    <meta property="og:url" content="https://www.freestar.cz/kalendar.html">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/styles.css?v=14">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+    <script src="assets/js/main.js" defer></script>
+
+    <style>
+        /* ── Hero ── */
+        .calendar-hero {
+            padding-top: calc(var(--header-height) + 3.4rem);
+            padding-bottom: 2.8rem;
+            background:
+                linear-gradient(180deg, rgba(238, 244, 231, 0.96), rgba(255, 249, 237, 1)),
+                var(--green-100);
+        }
+        .calendar-hero .section-heading { margin-bottom: 0; }
+        .calendar-hero h1 { font-size: clamp(2.55rem, 6vw, 4.8rem); }
+
+        /* ── Filters ── */
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 2.4rem;
+        }
+        .filter-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.45rem 1.1rem;
+            border: 1.5px solid var(--line);
+            border-radius: 999px;
+            background: var(--white);
+            color: var(--ink);
+            font-family: "Lato", Arial, sans-serif;
+            font-size: 0.88rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+        }
+        .filter-btn:hover {
+            border-color: var(--green-650);
+            color: var(--green-900);
+        }
+        .filter-btn.is-active {
+            background: var(--green-900);
+            border-color: var(--green-900);
+            color: var(--white);
+        }
+        .filter-btn svg { flex-shrink: 0; }
+
+        /* ── Events grid ── */
+        .events-section { padding: 3rem 0 5rem; }
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1.2rem;
+        }
+        @media (max-width: 720px) {
+            .events-grid { grid-template-columns: 1fr; }
+        }
+
+        /* ── Event card ── */
+        .event-card {
+            display: flex;
+            gap: 0;
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 6px 24px rgba(36, 60, 41, 0.08);
+            overflow: hidden;
+            transition: transform 180ms ease, box-shadow 180ms ease;
+        }
+        .event-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 36px rgba(36, 60, 41, 0.14);
+        }
+        .event-card.is-hidden { display: none; }
+
+        /* date badge */
+        .event-date {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            width: 72px;
+            padding: 1rem 0;
+            text-align: center;
+            line-height: 1;
+        }
+        .event-date__day {
+            font-family: "Fraunces", Georgia, serif;
+            font-size: 2.2rem;
+            font-weight: 800;
+            line-height: 1;
+            color: var(--white);
+        }
+        .event-date__month {
+            font-size: 0.72rem;
+            font-weight: 900;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.82);
+            margin-top: 0.2rem;
+        }
+        .event-date__day-name {
+            font-size: 0.66rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.6);
+            margin-top: 0.35rem;
+        }
+        .event-date--sm .event-date__day {
+            font-size: 1.3rem;
+            letter-spacing: -0.01em;
+        }
+
+        /* category colors */
+        .event-card[data-cat="hudba"]   .event-date { background: #5a3590; }
+        .event-card[data-cat="kultura"] .event-date { background: #1a5c4a; }
+        .event-card[data-cat="gastro"]  .event-date { background: #8f3620; }
+        .event-card[data-cat="vylety"]  .event-date { background: #1a5e7a; }
+
+        /* body */
+        .event-body {
+            padding: 0.85rem 1rem 0.85rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.28rem;
+            flex: 1;
+            min-width: 0;
+        }
+        .event-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.7rem;
+            font-weight: 900;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+        }
+        .event-card[data-cat="hudba"]   .event-tag { color: #5a3590; }
+        .event-card[data-cat="kultura"] .event-tag { color: #1a5c4a; }
+        .event-card[data-cat="gastro"]  .event-tag { color: #8f3620; }
+        .event-card[data-cat="vylety"]  .event-tag { color: #1a5e7a; }
+
+        .event-title {
+            font-family: "Fraunces", Georgia, serif;
+            font-size: 1.05rem;
+            font-weight: 700;
+            line-height: 1.25;
+            color: var(--ink);
+            margin: 0;
+        }
+        .event-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem 0.9rem;
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+        .event-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.28rem;
+        }
+        .event-desc {
+            font-size: 0.88rem;
+            color: var(--muted);
+            margin: 0;
+            line-height: 1.55;
+        }
+        .event-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--green-800);
+            text-decoration: none;
+            margin-top: 0.1rem;
+        }
+        .event-link:hover { text-decoration: underline; }
+
+        /* month separator */
+        .month-label {
+            grid-column: 1 / -1;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 0.8rem;
+            margin-bottom: 0.2rem;
+        }
+        .month-label h2 {
+            font-family: "Fraunces", Georgia, serif;
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--green-900);
+            margin: 0;
+            white-space: nowrap;
+        }
+        .month-label::after {
+            content: "";
+            display: block;
+            flex: 1;
+            height: 1px;
+            background: var(--line);
+        }
+        .month-label.is-hidden { display: none; }
+
+        /* ── Featured card — zelené ohraničení ── */
+        .event-card--featured {
+            border: 2.5px solid var(--green-800);
+            box-shadow: 0 0 0 4px rgba(56, 93, 61, 0.12), 0 8px 28px rgba(36, 60, 41, 0.13);
+            position: relative;
+        }
+        .event-card--featured::before {
+            content: "★ V NAŠEM KEMPU";
+            position: absolute;
+            top: -1px;
+            right: 12px;
+            background: var(--green-800);
+            color: #fff;
+            font-size: 0.65rem;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            padding: 0.2rem 0.55rem;
+            border-radius: 0 0 6px 6px;
+        }
+        .event-card--featured .event-date { background: var(--green-800); }
+        .event-card--featured .event-tag { color: var(--green-800); }
+
+        /* empty state */
+        .events-empty {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 3rem 0;
+            display: none;
+        }
+        .events-empty.is-visible { display: block; }
+        .events-empty p { font-size: 1.05rem; }
+    </style>
+</head>
+<body>
+    <a class="skip-link" href="#main-content">Přejít na obsah</a>
+
+    <header class="site-header" data-site-header>
+        <nav class="nav container" aria-label="Hlavní navigace">
+            <a class="brand" href="index.html#top" aria-label="Autocamp Free Star – úvod">
+                <img src="assets/img/logofs.png" alt="Autocamp Free Star" width="962" height="140">
+            </a>
+            <button class="nav-toggle" type="button" aria-controls="primary-navigation" aria-expanded="false" aria-label="Otevřít menu">
+                <i data-lucide="menu" aria-hidden="true"></i>
+            </button>
+            <div class="nav-menu" id="primary-navigation" data-nav-menu>
+                <a href="index.html#about">O kempu</a>
+                <a href="index.html#accommodation">Ubytování</a>
+                <a href="index.html#amenities">Služby</a>
+                <a href="index.html#surroundings">Okolí</a>
+                <a href="galerie.html">Galerie</a>
+                <a href="kalendar.html" aria-current="page">Kalendář akcí</a>
+                <a href="index.html#pricing">Ceník</a>
+                <a href="index.html#contact">Kontakt</a>
+                <a class="button button--small" href="index.html#booking">Rezervovat</a>
+            </div>
+        </nav>
+    </header>
+
+    <main id="main-content">
+
+        <!-- Hero -->
+        <section class="section calendar-hero" aria-labelledby="calendar-title">
+            <div class="container section-heading reveal">
+                <p class="section-label">Program v okolí kempu</p>
+                <h1 id="calendar-title">Kalendář akcí</h1>
+                <p>Koncerty, festivaly, degustace vín a výlety na jižní Moravě — vše dostupné z kempu Free Star.</p>
+            </div>
+        </section>
+
+        <!-- Events -->
+        <section class="events-section" aria-label="Přehled akcí">
+            <div class="container">
+
+                <!-- Filters -->
+                <div class="filter-bar" role="group" aria-label="Filtr akcí">
+                    <button class="filter-btn is-active" data-filter="vse">
+                        <i data-lucide="layout-grid" width="14" height="14" aria-hidden="true"></i>
+                        Vše
+                    </button>
+                    <button class="filter-btn" data-filter="hudba">
+                        <i data-lucide="music" width="14" height="14" aria-hidden="true"></i>
+                        Hudba &amp; Koncerty
+                    </button>
+                    <button class="filter-btn" data-filter="kultura">
+                        <i data-lucide="landmark" width="14" height="14" aria-hidden="true"></i>
+                        Kultura &amp; Festivaly
+                    </button>
+                    <button class="filter-btn" data-filter="gastro">
+                        <i data-lucide="wine" width="14" height="14" aria-hidden="true"></i>
+                        Víno &amp; Gastro
+                    </button>
+                    <button class="filter-btn" data-filter="vylety">
+                        <i data-lucide="bike" width="14" height="14" aria-hidden="true"></i>
+                        Výlety
+                    </button>
+                </div>
+
+                <!-- Events grid -->
+                <div class="events-grid" id="events-grid">
+
+                    <!-- ══ ČERVENEC ══ -->
+                    <div class="month-label" data-month="cervenec"><h2>Červenec 2026</h2></div>
+
+                    <!-- 2.7. Letní degustace vín -->
+                    <article class="event-card reveal" data-cat="gastro" data-month="cervenec">
+                        <div class="event-date" aria-hidden="true">
+                            <span class="event-date__day">2</span>
+                            <span class="event-date__month">Čvc</span>
+                            <span class="event-date__day-name">Čt</span>
+                        </div>
+                        <div class="event-body">
+                            <span class="event-tag"><i data-lucide="wine" width="11" height="11" aria-hidden="true"></i> Víno &amp; Gastro</span>
+                            <h3 class="event-title">Letní degustace vín</h3>
+                            <div class="event-meta">
+                                <span><i data-lucide="calendar" width="12" height="12" aria-hidden="true"></i> 2. 7. – 27. 8.</span>
+                                <span><i data-lucide="map-pin" width="12" height="12" aria-hidden="true"></i> Hustopeče</span>
+                            </div>
+                            <p class="event-desc">Celosezónní degustace vín na vinotéce vinařů Hustopečska. Ochutnávejte místní odrůdy po celé prázdniny.</p>
+                        </div>
+                    </article>
+
+                    <!-- 3.7. Adam Ďurica @ Sonberk -->
+                    <article class="event-card reveal" data-cat="hudba" data-month="cervenec">
+                        <div class="event-date" aria-hidden="true">
+                            <span class="event-date__day">3</span>
+                            <span class="event-date__month">Čvc</span>
+                            <span class="event-date__day-name">Pá</span>
+                        </div>
+                        <div class="event-body">
+                            <span class="event-tag"><i data-lucide="music" width="11" height="11" aria-hidden="true"></i> Hudba na vinicích</span>
+                            <h3 class="event-title">Adam Ďurica — Vinařství Sonberk</h3>
+                            <div class="event-meta">
+                                <span><i data-lucide="map-pin" width="12" height="12" aria-hidden="true"></i> Sonberk, Popice</span>
+                            </div>
+                            <p class="event-desc">Oblíbený slovenský zpěvák jako součást série letních koncertů ve vinicích pod Pálavou.</p>
+                            <a class="event-link" href="https://xticket.cz" target="_blank" rel="noopener noreferrer">
+                                <i data-lucide="ticket" width="12" height="12" aria-hidden="true"></i> Vstupenky na xticket.cz
+                            </a>
+                        </div>
+                    </article>
+
+                    <!-- 4.7. Tata Bojs @ Sonberk -->
+                    <article class="event-card reveal" data-cat="hudba" data-month="cervenec">
+                        <div class="event-date" aria-hidden="true">
+                            <span class="event-date__day">4</span>
+                            <span class="event-date__month">Čvc</span>
+                            <span class="event-date__day-name">So</span>
+                        </div>
+                        <div class="event-body">
+                            <span class="event-tag"><i data-lucide="music" width="11" height="11" aria-hidden="true"></i> Hudba na vinicích</span>
+                            <h3 class="event-title">Tata Bojs — Vinařství Sonberk</h3>
+                            <div class="event-meta">
+                                <span><i data-lucide="map-pin" width="12" height="12" aria-hidden="true"></i> Sonberk, Popice</span>
+                            </div>
+                            <p class="event-desc">Kultovní česká kapela s nezaměnitelným zvukem v jedinečném prostředí jihomoravských vinic.</p>
+                            <a class="event-link" href="https://xticket.cz" target="_blank" rel="noopener noreferrer">
+                                <i data-lucide="ticket" width="12" height="12" aria-hidden="true"></i> Vstupenky na xticket.cz
+                            </a>
+                        </div>
+                    </article>
+
+                    <!-- 6.7. Letní kino -->
+                    <article class="event-card reveal" data-cat="kultura" data-month="cervenec">
+                        <div class="event-date" aria-hidden="true">
+                            <span class="event-date__day">6</span>
+                            <span class="event-date__month">Čvc</span>
+                            <span class="event-date__day-name">Po</span>
+                        </div>
+                        <div class="event-body">
+                            <span class="event-tag"><i data-lucide="landmark" width="11" height="11" aria-hidden="true"></i> Kultura</span>
+                            <h3 class="event-title">Letní kino Hustopeče</h3>
+                            <div class="event-meta">
+                                <span><i data-lucide="calendar" width="12" height="12" aria-hidden="true"></i> 6. – 30. 7.</span>
+                                <span><i data-lucide="map-pin" width="12" height="12" aria-hidden="true"></i> Hustopeče</span>
+                            </div>
+                            <p class="event-desc">Venkovní letní promítání pod hvězdami po celý červenec. Příjemný večer pro celou rodinu.</p>
+                        </div>
+                    </article>
+
+                    <!-- 11.7. Čechomor @ Sonberk -->
+                    <article class="event-card reveal" data-cat="hudba" data-month="cervenec">
+                        <div class="event-date" aria-hidden="true">
+                            <span class="event-date__day">11</span>
+                            <span class="event-date__month">Čvc</span>
+                            <span class="event-date__day-name">So</span>
+                        </div>
+                        <div class="event-body">
+                            <span class="event-tag"><i data-lucide="music" width="11" height="11" aria-hidden="true"></i> Hudba na vinicích</span>
+                            <h3 class="event-title">Čechomor — Vinařství Sonberk</h3>
+                            <div class="event-meta">
+                                <span><i data-lucide="map-pin" width="12" height="12" aria-hidden="true"></i> Sonberk, Popice</span>
+                            </div>
+                            <p class="event-desc">Legendární folk-rocková dvojice s moravskými kořeny přímo ve vinicích Pálavské oblasti.</p>
+                            <a class="event-link" href="https://xticket.cz" target="_blank" rel="noopener noreferrer">
+                                <i data-lucide="ticket" width="12" height="12" aria-hidden="true"></i> Vstupenky na xticket.cz
+                            </a>
+                        </div>
+                    </article>
+
+                    <!-- 13.7. Výstava Mikulov -->
+                    <article class="event-card reveal" data-cat="kultura" data-month="cervenec">
+                        <div class="event-date" aria-hidden="true">
+                            <span class="event-date__day">13</span>
+                            <span class="event-date__month">Čvc</span>
+                            <span class="event-date__day-name">Po</span>
+                        </div>
+                        <div class="event-body">
+                            <span class="event-tag"><i data-lucide="landmark" width="11" height="11" aria-hidden="true"></i> Výstava</span>
+                            <h3 class="event-title">„Až já smutný pujdu na tú vojnu" — výstava</h3>
+                            <div class="event-meta">
+                                <span><i data-lucide="calendar" width="12" height="12" aria-hidden="true"></i> 13. – 17. 7.</span>
+                                <span><i data-lucide="map-pin" width="12" height="12" aria-hidden="true"></i> Muzeum Mikulov</span>
+                            </div>
+                            <p class="event-desc">Historická výstava přibližující vojenskou historii regionu v prostorách mikulovského muzea.</p>
+                        </div>
+                    </article>
+
+                    <!-- 15.7. Večerní zámek (každou středu) -->
+                    <article class="event-card reveal" data-cat="kultura" data-month="cervenec">
+                        <div class="event-date event-date--sm" aria-hidden="true">
+                            <span class="event-date__day">Každou</span>
+                            <span class="event-date__month">středu</span>
+                            <span class="event-date__day-name">7 &amp; 8/26</span>
+                        </div>
+                        <div class="event-body">
+                            <span class="event-tag"><i data-lucide="landmark" width="11" height="11" aria-hidden="true"></i> Kultura</span>
+                            <h3 class="event-title">Večerní zámek Mikulov</h3>
+                            <div class="event-meta">
+                                <span><i data-lucide="calendar" width="12" height="12" aria-hidden="true"></i> Každou středu v červenci a srpnu</span>
+                                <span><i data-lucide="map-pin" width="12" height="12" aria-hidden="true"></i> Zámek Mikulov</span>
+                            </div>
+                            <p class="event-desc">Večerní prohlídky mikulovského zámku s jedinečnou atmosférou — jiný pohled na historii za soumraku.</p>
+                        </div>
+                    </article>
+
+                    <!-- 17.7. Anna K. @ Sonberk -->
+                    <article class="event-card reveal" data-cat="hudba" data-month="cervenec">
+                        <div class="event-date" aria-hidden="true">
+                            <span class="event-date__day">17</span>
+                            <span class="event-date__month">Čvc</span>
+                            <span class="event-date__day-name">Pá</span>
+                        </div>
+                        <div class="event-body">
+                            <span class="event-tag"><i data-lucide="music" width="11" height="11" aria-hidden="true"></i> Hudba na vinicích</span>
+                            <h3 class="event-title">Anna K. — Vinařství Sonberk</h3>
+                            <div class="event-meta">
+                                <span><i data-lucide="map-pin" width="12" height="12" aria-hidden="true"></i> Sonberk, Popice</span>
+                            </div>
+                            <p class="event-desc">Jedinečný ženský hlas české hudební scény v romantickém prostředí vinic za soumraku.</p>
+                            <a class="event-link" href="https://xticket.cz" target="_blank" rel="noopener noreferrer">
+                                <i data-lucide="ticket" width="12" height="12" aria-hidden="true"></i> Vstupenky na xticket.cz
+                            </a>
+                        </div>
+                    </article>
+
+                    <!-- 17.-19.7. Festival Národy Podyjí -->
+                    <article class="event-card reveal" data-cat="kultura" data-month="cervenec">
+                        <div class="event-date" aria-hidden="true">
+                            <span class="event-date__day">17</span>
+                            <span class="event-date__month">Čvc</span>
+                            <span class="event-date__day-name">Pá</span>
+                        </div>
+                        <div class="event-body">
+                            <span class="event-tag"><i data-lucide="landmark" width="11" height="11" aria-hidden="true"></i> Festival</span>
+                            <h3 class="event-title">XVII. Festival Národy Podyjí</h3>
+                            <div class="event-meta">
+                                <span><i data-lucide="calendar" width="12" height="12" aria-hidden="true"></i> 17. – 19. 7.</span>
+                                <span><i data-lucide="map-pin" width="12" height="12" aria-hidden="true"></i> Mikulov</span>
+                            </div>
+                            <p class="event-desc">Multižánrový folklorní a kulturní festival propojující národy a tradice Podyjské oblasti. Gastro, hudba, řemesla.</p>
+                        </div>
+                    </article>
+
+                    <!-- 18.7. Mig 21 @ Sonberk -->
+                    <article class="event-card reveal" data-cat="hudba" data-month="cervenec">
+                        <div class="event-date" aria-hidden="true">
+                            <span class="event-date__day">18</span>
+                            <span class="event-date__month">Čvc</span>
+                            <span class="event-date__day-name">So</span>
+                        </div>
+                        <div class="event-body">
+                            <span class="event-tag"><i data-lucide="music" width="11" height="11" aria-hidden="true"></i> Hudba na vinicích</span>
+                            <h3 class="event-title">Mig 21 — Vinařství Sonberk</h3>
+                            <div class="event-meta">
+                                <span><i data-lucide="map-pin" width="12" height="12" aria-hidden="true"></i> Sonberk, Popice</span>
+                            </div>
+                            <p class="event-desc">Slovenská rocková legenda s hity napříč generacemi. Ideální kombinace s pohárkem místního vína.</p>
+                            <a class="event-link" href="https://xticket.cz" target="_blank" rel="noopener noreferrer">
+                                <i data-lucide="ticket" width="12" height="12" aria-hidden="true"></i> Vstupenky na xticket.cz
+                            </a>
+                        </div>
+                    </article>
+
+                    <!-- 18.7. Cyklovýlet Krajem vína -->
+                    <article class="event-card reveal" data-cat="vylety" data-month="cervenec">
+                        <div class="event-date" aria-hidden="true">
+                            <span class="event-date__day">18</span>
+                            <span class="event-date__month">Čvc</span>
+                            <span class="event-date__day-name">So</span>
+                        </div>
+                        <div class="event-body">
+                            <span class="event-tag"><i data-lucide="bike" width="11" height="11" aria-hidden="true"></i> Výlet</span>
+                            <h3 class="event-title">Krajem vína — Na kole za vůní Pálavy</h3>
+                            <div class="event-meta">
+                                <span><i data-lucide="map-pin" width="12" height="12" aria-hidden="true"></i> Dolní Věstonice</span>
+                            </div>
+                            <p class="event-desc">Organizovaný cyklovýlet po vinařských stezkách Pálavské oblasti s výhledy na nádrže Nové Mlýny.</p>
+                        </div>
+                    </article>
+
+                    <!-- 21.7. Igor Orozovič -->
+                    <article class="event-card reveal" data-cat="hudba" data-month="cervenec">
+                        <div class="event-date" aria-hidden="true">
+                            <span class="event-date__day">21</span>
+                            <span class="event-date__month">Čvc</span>
+                            <span class="event-date__day-name">Út</span>
+                        </div>
+                        <div class="event-body">
+                            <span class="event-tag"><i data-lucide="music" width="11" height="11" aria-hidden="true"></i> Modré úterý</span>
+                            <h3 class="event-title">Igor Orozovič &amp; Co — koncert</h3>
+                            <div class="event-meta">
+                                <span><i data-lucide="map-pin" width="12" height="12" aria-hidden="true"></i> Podivín</span>
+                            </div>
+                            <p class="event-desc">Letní koncertní série Modré úterý — příjemný večer s jazzovými a bluesovými tóny v zahradním prostředí.</p>
+                        </div>
+                    </article>
+
+                    <!-- 24.7. 4 Tenoři @ Sonberk -->
+                    <article class="event-card reveal" data-cat="hudba" data-month="cervenec">
+                        <div class="event-date" aria-hidden="true">
+                            <span class="event-date__day">24</span>
+                            <span class="event-date__month">Čvc</span>
+                            <span class="event-date__day-name">Pá</span>
+                        </div>
+                        <div class="event-body">
+                            <span class="event-tag"><i data-lucide="music" width="11" height="11" aria-hidden="true"></i> Hudba na vinicích</span>
+                            <h3 class="event-title">4 Tenoři — Vinařství Sonberk</h3>
+                            <div class="event-meta">
+                                <span><i data-lucide="map-pin" width="12" height="12" aria-hidden="true"></i> Sonberk, Popice</span>
+                            </div>
+                            <p class="event-desc">Čtyři přední čeští tenoři spojí operní árie s populárními melodiemi pod letní oblohou nad vinicemi.</p>
+                            <a class="event-link" href="https://xticket.cz" target="_blank" rel="noopener noreferrer">
+                                <i data-lucide="ticket" width="12" height="12" aria-hidden="true"></i> Vstupenky na xticket.cz
+                            </a>
+                        </div>
+                    </article>
+
+                    <!-- 24.-25.7. Moravský Parnas -->
+                    <article class="event-card reveal" data-cat="kultura" data-month="cervenec">
+                        <div class="event-date" aria-hidden="true">
+                            <span class="event-date__day">24</span>
+                            <span class="event-date__month">Čvc</span>
+                            <span class="event-date__day-name">Pá</span>
+                        </div>
+                        <div class="event-body">
+                            <span class="event-tag"><i data-lucide="landmark" width="11" height="11" aria-hidden="true"></i> Divadelní festival</span>
+                            <h3 class="event-title">Moravský Parnas — Divadelní festival Mikulov</h3>
+                            <div class="event-meta">
+                                <span><i data-lucide="calendar" width="12" height="12" aria-hidden="true"></i> 24. – 25. 7.</span>
+                                <span><i data-lucide="map-pin" width="12" height="12" aria-hidden="true"></i> Zámek Mikulov</span>
+                            </div>
+                            <p class="event-desc">Divadelní festival v historické kulise zámku Mikulov. Divadelní představení, performance a kulturní program na nádvoří.</p>
+                        </div>
+                    </article>
+
+                    <!-- 25.7. No Name @ Sonberk -->
+                    <article class="event-card reveal" data-cat="hudba" data-month="cervenec">
+                        <div class="event-date" aria-hidden="true">
+                            <span class="event-date__day">25</span>
+                            <span class="event-date__month">Čvc</span>
+                            <span class="event-date__day-name">So</span>
+                        </div>
+                        <div class="event-body">
+                            <span class="event-tag"><i data-lucide="music" width="11" height="11" aria-hidden="true"></i> Hudba na vinicích</span>
+                            <h3 class="event-title">No Name — Vinařství Sonberk</h3>
+                            <div class="event-meta">
+                                <span><i data-lucide="map-pin" width="12" height="12" aria-hidden="true"></i> Sonberk, Popice</span>
+                            </div>
+                            <p class="event-desc">Slovenská pop-rocková kapela s hity jako „Nebo nad nami" v kouzelném prostředí letní vinice.</p>
+                            <a class="event-link" href="https://xticket.cz" target="_blank" rel="noopener noreferrer">
+                                <i data-lucide="ticket" width="12" height="12" aria-hidden="true"></i> Vstupenky na xticket.cz
+                            </a>
+                        </div>
+                    </article>
+
+                    <!-- 30.7. Strachotínské Hody -->
+                    <article class="event-card event-card--featured reveal" data-cat="kultura" data-month="cervenec">
+                        <div class="event-date event-date--sm" aria-hidden="true">
+                            <span class="event-date__day">31.7</span>
+                            <span class="event-date__month">–2.8.</span>
+                            <span class="event-date__day-name">Pá–Ne</span>
+                        </div>
+                        <div class="event-body">
+                            <span class="event-tag"><i data-lucide="landmark" width="11" height="11" aria-hidden="true"></i> Místní tradice</span>
+                            <h3 class="event-title">Strachotínské Hody</h3>
+                            <div class="event-meta">
+                                <span><i data-lucide="calendar" width="12" height="12" aria-hidden="true"></i> 31. 7. – 2. 8. (pátek – neděle)</span>
+                                <span><i data-lucide="map-pin" width="12" height="12" aria-hidden="true"></i> Strachotín</span>
+                            </div>
+                            <p class="event-desc">Krojované hody ve vesnici, kde se náš kemp nachází. Tradiční moravská slavnost s průvodem, hudbou a tancem přímo za branami kempu.</p>
+                        </div>
+                    </article>
+
+                    <!-- 31.7. David Koller @ Sonberk -->
+                    <article class="event-card reveal" data-cat="hudba" data-month="cervenec">
+                        <div class="event-date" aria-hidden="true">
+                            <span class="event-date__day">31</span>
+                            <span class="event-date__month">Čvc</span>
+                            <span class="event-date__day-name">Pá</span>
+                        </div>
+                        <div class="event-body">
+                            <span class="event-tag"><i data-lucide="music" width="11" height="11" aria-hidden="true"></i> Hudba na vinicích</span>
+                            <h3 class="event-title">David Koller — Vinařství Sonberk</h3>
+                            <div class="event-meta">
+                                <span><i data-lucide="map-pin" width="12" height="12" aria-hidden="true"></i> Sonberk, Popice</span>
+                            </div>
+                            <p class="event-desc">Frontman Tublatanky David Koller solo — intimní večer s písněmi, které zná každý.</p>
+                            <a class="event-link" href="https://xticket.cz" target="_blank" rel="noopener noreferrer">
+                                <i data-lucide="ticket" width="12" height="12" aria-hidden="true"></i> Vstupenky na xticket.cz
+                            </a>
+                        </div>
+                    </article>
+
+                    <!-- ══ SRPEN ══ -->
+                    <div class="month-label" data-month="srpen"><h2>Srpen 2026</h2></div>
+
+                    <!-- 1.8. Kateřina Marie Tichá @ Sonberk -->
+                    <article class="event-card reveal" data-cat="hudba" data-month="srpen">
+                        <div class="event-date" aria-hidden="true">
+                            <span class="event-date__day">1</span>
+                            <span class="event-date__month">Srp</span>
+                            <span class="event-date__day-name">So</span>
+                        </div>
+                        <div class="event-body">
+                            <span class="event-tag"><i data-lucide="music" width="11" height="11" aria-hidden="true"></i> Hudba na vinicích</span>
+                            <h3 class="event-title">Kateřina Marie Tichá — Vinařství Sonberk</h3>
+                            <div class="event-meta">
+                                <span><i data-lucide="map-pin" width="12" height="12" aria-hidden="true"></i> Sonberk, Popice</span>
+                            </div>
+                            <p class="event-desc">Výjimečný ženský hlas české pop-folk scény v letním prostředí vinic jihomoravského Podpálaví.</p>
+                            <a class="event-link" href="https://xticket.cz" target="_blank" rel="noopener noreferrer">
+                                <i data-lucide="ticket" width="12" height="12" aria-hidden="true"></i> Vstupenky na xticket.cz
+                            </a>
+                        </div>
+                    </article>
+
+                    <!-- 7.8. Monkey Business @ Sonberk -->
+                    <article class="event-card reveal" data-cat="hudba" data-month="srpen">
+                        <div class="event-date" aria-hidden="true">
+                            <span class="event-date__day">7</span>
+                            <span class="event-date__month">Srp</span>
+                            <span class="event-date__day-name">Pá</span>
+                        </div>
+                        <div class="event-body">
+                            <span class="event-tag"><i data-lucide="music" width="11" height="11" aria-hidden="true"></i> Hudba na vinicích</span>
+                            <h3 class="event-title">Monkey Business — Vinařství Sonberk</h3>
+                            <div class="event-meta">
+                                <span><i data-lucide="map-pin" width="12" height="12" aria-hidden="true"></i> Sonberk, Popice</span>
+                            </div>
+                            <p class="event-desc">Energická česká funk-soul kapela přináší taneční náladu do vinice. Nezapomenutelný letní večer.</p>
+                            <a class="event-link" href="https://xticket.cz" target="_blank" rel="noopener noreferrer">
+                                <i data-lucide="ticket" width="12" height="12" aria-hidden="true"></i> Vstupenky na xticket.cz
+                            </a>
+                        </div>
+                    </article>
+
+                    <!-- 8.8. Vernisáž Mikulov -->
+                    <article class="event-card reveal" data-cat="kultura" data-month="srpen">
+                        <div class="event-date" aria-hidden="true">
+                            <span class="event-date__day">8</span>
+                            <span class="event-date__month">Srp</span>
+                            <span class="event-date__day-name">So</span>
+                        </div>
+                        <div class="event-body">
+                            <span class="event-tag"><i data-lucide="landmark" width="11" height="11" aria-hidden="true"></i> Kultura</span>
+                            <h3 class="event-title">Vernisáž — Mikulovské výtvarné symposium</h3>
+                            <div class="event-meta">
+                                <span><i data-lucide="map-pin" width="12" height="12" aria-hidden="true"></i> Zámek Mikulov</span>
+                            </div>
+                            <p class="event-desc">Slavnostní zakončení výtvarného sympozia „Dílna" s vernisáží výstupních prací umělců v prostorách zámku.</p>
+                        </div>
+                    </article>
+
+                    <!-- 14.8. Olympic @ Sonberk -->
+                    <article class="event-card reveal" data-cat="hudba" data-month="srpen">
+                        <div class="event-date" aria-hidden="true">
+                            <span class="event-date__day">14</span>
+                            <span class="event-date__month">Srp</span>
+                            <span class="event-date__day-name">Pá</span>
+                        </div>
+                        <div class="event-body">
+                            <span class="event-tag"><i data-lucide="music" width="11" height="11" aria-hidden="true"></i> Hudba na vinicích</span>
+                            <h3 class="event-title">Olympic — Vinařství Sonberk</h3>
+                            <div class="event-meta">
+                                <span><i data-lucide="map-pin" width="12" height="12" aria-hidden="true"></i> Sonberk, Popice</span>
+                            </div>
+                            <p class="event-desc">Legendární česká rocková kapela uzavírá sérii Hudba na vinicích 2026. Večer plný hitů a skvělého vína.</p>
+                            <a class="event-link" href="https://xticket.cz" target="_blank" rel="noopener noreferrer">
+                                <i data-lucide="ticket" width="12" height="12" aria-hidden="true"></i> Vstupenky na xticket.cz
+                            </a>
+                        </div>
+                    </article>
+
+                    <!-- ══ ZÁŘÍ ══ -->
+                    <div class="month-label" data-month="zari"><h2>Září 2026</h2></div>
+
+                    <!-- 12.9. Festival Symbióza -->
+                    <article class="event-card reveal" data-cat="kultura" data-month="zari">
+                        <div class="event-date" aria-hidden="true">
+                            <span class="event-date__day">12</span>
+                            <span class="event-date__month">Zář</span>
+                            <span class="event-date__day-name">So</span>
+                        </div>
+                        <div class="event-body">
+                            <span class="event-tag"><i data-lucide="landmark" width="11" height="11" aria-hidden="true"></i> Festival</span>
+                            <h3 class="event-title">Festival Symbióza 2026</h3>
+                            <div class="event-meta">
+                                <span><i data-lucide="map-pin" width="12" height="12" aria-hidden="true"></i> Hustopeče</span>
+                            </div>
+                            <p class="event-desc">Multižánrový kulturní festival spojující hudbu, umění, gastronomii a místní komunitu na konci léta.</p>
+                        </div>
+                    </article>
+
+                    <!-- 17.-19.9. Burčákové slavnosti -->
+                    <article class="event-card reveal" data-cat="gastro" data-month="zari">
+                        <div class="event-date" aria-hidden="true">
+                            <span class="event-date__day">17</span>
+                            <span class="event-date__month">Zář</span>
+                            <span class="event-date__day-name">Čt</span>
+                        </div>
+                        <div class="event-body">
+                            <span class="event-tag"><i data-lucide="wine" width="11" height="11" aria-hidden="true"></i> Víno &amp; Gastro</span>
+                            <h3 class="event-title">Burčákové slavnosti Hustopeče</h3>
+                            <div class="event-meta">
+                                <span><i data-lucide="calendar" width="12" height="12" aria-hidden="true"></i> 17. – 19. 9.</span>
+                                <span><i data-lucide="map-pin" width="12" height="12" aria-hidden="true"></i> Dukelské nám., Hustopeče</span>
+                            </div>
+                            <p class="event-desc">Tradiční recesistická slavnost s burčákem, hudebním programem (Čechomor, Mig 21, Ivan Mládek), jarmarkem a ohňovou show. Čt od 16:00, Pá od 18:00, So od 9:00.</p>
+                        </div>
+                    </article>
+
+                    <!-- Empty state -->
+                    <div class="events-empty" id="events-empty" aria-live="polite">
+                        <i data-lucide="calendar-x" width="48" height="48" style="color: var(--green-650); margin: 0 auto 1rem; display: block;" aria-hidden="true"></i>
+                        <p>V této kategorii aktuálně nejsou žádné akce.</p>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-grid">
+            <div>
+                <a class="brand brand--footer" href="index.html#top"><img src="assets/img/logofs.png" alt="Autocamp Free Star" width="962" height="140"></a>
+                <p>Autocamp Free Star · Strachotín · Jižní Morava</p>
+                <div class="footer-social">
+                    <a href="https://www.instagram.com/autocampfreestar/" class="footer-social__link" aria-label="Instagram kempu Free Star" rel="noopener noreferrer" target="_blank">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                    </a>
+                    <a href="https://www.facebook.com/autocampfreestar/" class="footer-social__link" aria-label="Facebook kempu Free Star" rel="noopener noreferrer" target="_blank">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+                    </a>
+                </div>
+            </div>
+            <nav aria-label="Navigace v patičce">
+                <a href="index.html#accommodation">Ubytování</a>
+                <a href="galerie.html">Galerie</a>
+                <a href="kalendar.html">Kalendář akcí</a>
+                <a href="index.html#pricing">Ceník</a>
+                <a href="index.html#booking">Rezervace</a>
+                <a href="index.html#contact">Kontakt</a>
+                <a href="gdpr.html">GDPR</a>
+                <a href="ubytovaci-rad.html">Ubytovací řád</a>
+            </nav>
+            <p class="copyright">&copy; 2026 Autocamp Free Star. Všechna práva vyhrazena.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const filterBtns = document.querySelectorAll(".filter-btn");
+            const cards = document.querySelectorAll(".event-card");
+            const monthLabels = document.querySelectorAll(".month-label");
+            const emptyState = document.getElementById("events-empty");
+
+            filterBtns.forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const filter = btn.dataset.filter;
+
+                    filterBtns.forEach(b => b.classList.remove("is-active"));
+                    btn.classList.add("is-active");
+
+                    let visibleCount = 0;
+                    cards.forEach(card => {
+                        const match = filter === "vse" || card.dataset.cat === filter;
+                        card.classList.toggle("is-hidden", !match);
+                        if (match) visibleCount++;
+                    });
+
+                    monthLabels.forEach(label => {
+                        const month = label.dataset.month;
+                        const hasVisible = [...cards].some(
+                            c => c.dataset.month === month && !c.classList.contains("is-hidden")
+                        );
+                        label.classList.toggle("is-hidden", !hasVisible);
+                    });
+
+                    emptyState.classList.toggle("is-visible", visibleCount === 0);
+                });
+            });
+
+            if (typeof lucide !== "undefined") lucide.createIcons();
+        });
+    </script>
+</body>
+</html>
