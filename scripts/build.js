@@ -10,6 +10,7 @@ const files = [
     "gdpr.html",
     "kalendar.html",
     "ubytovaci-rad.html",
+    "planek-kempu.html",
     "assets/css/styles.css",
     "assets/js/main.js",
     ".htaccess",
