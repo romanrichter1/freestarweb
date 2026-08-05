@@ -785,6 +785,14 @@ ul {
     font-weight: 900;
 }
 
+.contact-hours {
+    display: block;
+    margin-top: 0.15rem;
+    color: var(--muted);
+    font-weight: 400;
+    font-size: 0.85rem;
+}
+
 .map-embed {
     overflow: hidden;
     border-radius: var(--radius);
